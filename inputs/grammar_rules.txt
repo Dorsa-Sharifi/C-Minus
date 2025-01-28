@@ -7,7 +7,7 @@ DeclarationPrime -> FunDeclarationPrime
 DeclarationPrime -> VarDeclarationPrime
 VarDeclarationPrime -> ; #Add_Var_SS
 VarDeclarationPrime -> [ #Push_NUM NUM ] ; #Create_Arr
-FunDeclarationPrime -> #Params_Declaration ( Params ) #Func_Beginning #Search_For_Return CompoundStmt #Found_Return #Return_Main #Func_ending
+FunDeclarationPrime -> #Params_Declaration ( Params ) #Func_Beginning #Search_For_Return CompoundStmt #Found_Return #Return_Main #Func_Ending
 TypeSpecifier -> int
 TypeSpecifier -> void
 Params -> int #Push_ID ID #Add_Var_SS ParamPrime ParamList
@@ -44,14 +44,14 @@ H -> = Expression #Assignment
 H -> G D C
 SimpleExpressionZegond -> AdditiveExpressionZegond C
 SimpleExpressionPrime -> AdditiveExpressionPrime C
-C -> #Pop_Relation Relop AdditiveExpression #Save_Opperation
+C -> #Pop_Relation Relop AdditiveExpression #Save_Operation
 C -> epsilon
 Relop -> <
 Relop -> ==
 AdditiveExpression -> Term D
 AdditiveExpressionPrime -> TermPrime D
 AdditiveExpressionZegond -> TermZegond D
-D -> #Pop_Relation Addop Term D #Save_Opperation
+D -> #Pop_Relation Addop Term D #Save_Operation
 D -> epsilon
 Addop -> +
 Addop -> -
