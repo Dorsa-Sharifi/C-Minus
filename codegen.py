@@ -1,9 +1,15 @@
+from PB import PB
+from SS import SS
+
+
 class Codegen:
     def __init__(self):
+        self.ss = SS()
+        self.pb = PB()
         pass
 
-
     def Push_ID(self):
+
         pass
     def Add_Var_SS(self):
         pass

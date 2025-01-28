@@ -1,7 +1,7 @@
 class SS:
     def __init__(self):
         self.stack = []
-        pass
+
     def push(self, element):
         self.stack.append(element)
 
