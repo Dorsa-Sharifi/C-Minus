@@ -6,7 +6,7 @@ DeclarationInitial -> TypeSpecifier #Push_ID ID
 DeclarationPrime -> FunDeclarationPrime
 DeclarationPrime -> VarDeclarationPrime
 VarDeclarationPrime -> ; #Add_Var_SS
-VarDeclarationPrime -> [ #Push_NUM NUM ] ; #Create_Arr
+VarDeclarationPrime -> [ #Push_Num NUM ] ; #Create_Arr
 FunDeclarationPrime -> #Params_Declaration ( Params ) #Func_Beginning #Search_For_Return CompoundStmt #Found_Return #Return_Main #Func_Ending
 TypeSpecifier -> int
 TypeSpecifier -> void
@@ -29,7 +29,7 @@ ExpressionStmt -> Expression ; #Remove_Data_From_SS
 ExpressionStmt -> break ; #End_of_Loop_Break
 ExpressionStmt -> ;
 SelectionStmt -> if ( Expression ) #Save Statement ElseStmt
-ElseStmt -> endif
+ElseStmt -> #Jump endif
 ElseStmt -> else #Jpf_Save Statement #Jump endif
 IterationStmt -> while #Label ( Expression ) #New_Break #Save Statement #While_Jumps #Return_Scope_with_Break
 ReturnStmt -> return ReturnStmtPrime #Save_Return_Point
@@ -58,7 +58,7 @@ Addop -> -
 Term -> SignedFactor G
 TermPrime -> SignedFactorPrime G
 TermZegond -> SignedFactorZegond G
-G -> Mulop SignedFactor #Multiply_Division G
+G -> #Pop_Relation Mulop SignedFactor #Multiply_Division G
 G -> epsilon
 Mulop -> *
 Mulop -> /
