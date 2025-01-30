@@ -16,35 +16,19 @@ class Codegen:
     def run(self, action):
         pass
 
-    def Push_ID(self, id):
-        #Save Id for future uses
-        self.ss.push(id)
-
-    def Add_Var_SS(self):
-        #Scope Managing
-        top = self.ss.pop()
-        addr = self.get_temp()
-        scope = self.current_scope
-        #TODO Add the given popped value to the symbol table
+    def Push_ID(self, ID):
+        self.ss.push(ID)
 
     def Push_Num(self, num):
         self.ss.push(num)
-    def Array_Args(self):
-        pass
-    def Next_Scope(self):
-        pass
-    def Prev_Scope(self):
-        pass
+
     def Remove_Data_From_SS(self):
         self.ss.pop()
 
-    def End_of_Loop_Break(self):
-
-        pass
     def Save(self):
         self.ss.push(self.index)
         self.index += 1
-        pass
+
     def Jpf_Save(self):
         destination, operator1 = self.ss.pop_with_num(2)
         target = self.index + 1
@@ -65,21 +49,10 @@ class Codegen:
         self.ss.pop()
         self.ss.pop()
         self.ss.pop()
-        pass
-    def Return_Scope_with_Break(self):
-        pass
-    def Save_Return_Point(self):
 
-        pass
-    def Push_Index(self, index):
-        pass
-    def Push_ID_Addr(self):
+    def Push_Index(self):
+        self.ss.push(f'#{self.index}')
 
-        pass
-    def Assignment(self):
-        pass
-    def Array_Indices(self):
-        pass
     def Pop_Relation(self, relation):
         self.ss.push(relation)
         pass
@@ -89,6 +62,7 @@ class Codegen:
         #TODO: a list of operands + add_code function
         self.ss.push(addr)
         pass
+
     def Multiply_Division(self):
         pass
     def Negative(self):
@@ -99,7 +73,7 @@ class Codegen:
     def Func_Call(self):
         pass
 
-    #Related to Scoping
+    #Related to Scoping, other stacks, etc
     def Create_Arr(self):
         #TODO:  Creates an array entry in the symbol table with the previously pushed number as its size.
         pass
@@ -117,7 +91,31 @@ class Codegen:
         pass
     def New_Break(self):
         pass
+    def Return_Scope_with_Break(self):
+        pass
+    def Save_Return_Point(self):
+        pass
+    def Push_ID_Addr(self):
+        pass
+    def Add_Var_SS(self):
+        #Scope Managing
+        top = self.ss.pop()
+        addr = self.get_temp()
+        scope = self.current_scope
+        #TODO Add the given popped value to the symbol table
 
+    def Array_Args(self):
+        pass
+    def Next_Scope(self):
+        pass
+    def Prev_Scope(self):
+        pass
+    def End_of_Loop_Break(self):
+        pass
+    def Assignment(self):
+        pass
+    def Array_Indices(self):
+        pass
 
     #Handy Functions
     def get_temp(self):
