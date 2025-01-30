@@ -38,6 +38,7 @@ class Codegen:
     def Jump(self):
         destination = int(self.ss.pop())
         self.pb.Add_Code('JP', {self.index},'','',destination)
+
     def Label(self):
         self.ss.push(self.index)
 
@@ -55,7 +56,7 @@ class Codegen:
 
     def Pop_Relation(self, relation):
         self.ss.push(relation)
-        pass
+
     def Save_Operation(self):
         addr = self.get_temp()
         operand2, operator, operand1 = self.ss.pop_with_num(3)
@@ -63,9 +64,13 @@ class Codegen:
         self.ss.push(addr)
         pass
 
-    def Multiply_Division(self):
-        pass
     def Negative(self):
+        temp = self.get_temp()
+        to_be_negated = self.ss.pop()
+        self.pb.Add_Code('SUB', 0, to_be_negated, temp, self.index)
+        self.ss.push(temp)
+
+    def Multiply_Division(self):
         pass
 
     def Func_Output(self):
