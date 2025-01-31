@@ -1,7 +1,6 @@
 
-from PB import PB
 from SS import SS
-
+#TODO Double check all the PB.Add_Codes
 #TODO Get back for printing possible errors
 class Codegen:
     def __init__(self):
@@ -10,8 +9,9 @@ class Codegen:
         self.index = 0
         self.current_scope = 0
         self.ss = SS()
-        self.pb = PB()
+        self.pb = []
         self.RS = []
+        self.BS = []
         self.symbol_table = dict()
         self.OperationDict = {'+': 'ADD',
                               '-': 'SUB',
@@ -136,35 +136,94 @@ class Codegen:
         self.current_scope -= 1
 
     def End_of_Loop_Break(self):
-        pass
+        self.BS.append(self.index)
+        self.index += 1
+
     def Assignment(self):
-        pass
+        operand1, operand2 = self.ss.pop_with_num(2)
+        self.pb.Add_Code('ASSIGN', operand1, operand2,'',int(self.index))
+        self.ss.pop()
+
     def Array_Indices(self):
-        pass
+        index, arr_addr = self.ss.pop_with_num(2)
+        # temp = self.generateTemp()
+        # result = self.generateTemp()
+        # self.pb.Add_Code(RelativeOperation.MULT.value, '#4', idx, temp)
+        # self.insert_code(RelativeOperation.ASSIGN.value, f'{array_address}', result)
+        # self.insert_code(RelativeOperation.ADD.value, result, temp, result)
+        # self.SS.append(f'@{result}')
+
     def Multiply_Division(self):
         pass
     def Func_Call(self):
+        if self.ss.access_members(-1) != 'output':
+            elements = []
+            collections = []
+            for top in self.ss.stack[::-1]:
+                if isinstance(top, list):
+                    collections = top
+                    break
+                elements = [top] + elements
+            # assign each element
+            for variable, element in zip(collections[1], elements):
+                self.pb.Add_Code(self.index,'ASSIGN', element, variable[2])
+                self.ss.pop()  # pop each element
+            for i in range(len(elements) - len(collections[1])):
+                self.ss.pop()
+            self.ss.pop()
+            # self.insert_code(RelativeOperation.ASSIGN.value, f'#{self.index + 2}', collections[2])
+            # jump
+            # self.insert_code(RelativeOperation.JP.value, collections[-1])
+            # save result to temp
+            result = self.generateTemp()
+            # self.insert_code(RelativeOperation.ASSIGN.value, collections[0], result)
+            self.ss.push(result)
         pass
+
     def Func_Ending(self):
-        pass
+        for _ in range(3):
+            self.ss.pop()
+
+        # Check the symbol table for a function, prioritizing 'main'
+        for st in reversed(self.symbol_table['IDs']):
+            if st[1] == 'function':
+                if st[0] == 'main':
+                    top = self.ss.pop()
+                    self.pb[top] = f'(ASSIGN, #0, {self.generateTemp()}, )'
+                    return
+                break  # Stop checking after the first function is found
+
+        # Default jump if no 'main' function was found
+        top = self.ss.pop()
+        self.pb[top] = f'(JP, {self.index}, , )'
+
     def New_Break(self):
-        pass
+        self.BS.append('>>>')
     def Return_Scope_with_Break(self):
-        pass
+        latest_block = len(self.BS) - self.BS[::-1].index('>>>') - 1
+        for item in self.BS[latest_block + 1:]:
+            self.pb[item] = f'(JP, {self.index}, , )'
+        self.BS = self.BS[:latest_block]
     def Save_Return_Point(self):
-        pass
+        self.RS.append((self.index, self.ss.access_members(-1)))
+        self.ss.pop()
+        self.index += 2
     def Found_Return(self):
-        pass
+        self.RS.append('>>>')
 
 
     #Handy Functions
     def generateTemp(self, i = 1):
         address = self.base_address
         for j in range(i):
-            self.pb.Add_Code('ASSIGN', '#0', str(self.base_address))
+            self.pb.Add_Code(self.index,'ASSIGN', '#0', str(self.base_address))
             self.base_address += self.memory_size
         return address
 
     def find_address(self, address):
 
         pass
+    def Add_Code(self, opcode, operation1, operation2='', dist=''):
+        i = self.index
+        self.pb[i] = f'({opcode}, {operation1}, {operation2}, {dist})'
+        self.index += 1
