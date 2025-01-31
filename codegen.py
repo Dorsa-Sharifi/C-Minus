@@ -12,6 +12,7 @@ class Codegen:
         self.ss = SS()
         self.pb = PB()
         self.RS = []
+        self.symbol_table = dict()
         self.OperationDict = {'+': 'ADD',
                               '-': 'SUB',
                               '*': 'MUL',
@@ -75,11 +76,21 @@ class Codegen:
 
     #Related to Scoping, other stacks, etc
     def Create_Arr(self):
-        #TODO:  Creates an array entry in the symbol table with the previously pushed number as its size.
-        pass
+        #Got help from a repo in GitHub
+        array_size = int(self.ss.pop()[1:])
+        array_id = self.ss.pop()
+        address = self.generateTemp()
+        array_space = self.generateTemp(array_size)
+        self.pb.Add_Code('ASSIGN', f'#{array_space}', address)
+        self.symbol_table['IDs'].append((array_id, 'int*', address, self.current_scope))
+
     def Params_Declaration(self):
-        #TODO: SYMBOL TABLE
-        pass
+        top = self.ss.pop()
+        self.ss.push(self.index)
+        self.index += 1
+        self.ss.push(top)
+        self.symbol_table['IDs'].append('>>')
+
     def Func_Beginning(self):
         pass
 
@@ -90,7 +101,6 @@ class Codegen:
         if self.ss.access_members(-3) != 'main':
             return_address = self.ss.access_members(-1)
             self.pb.Add_Code('JP', f'@{return_address}')
-        pass
 
     def Push_ID_Addr(self, addr):
         self.ss.push(self.find_address(addr))
@@ -111,11 +121,20 @@ class Codegen:
 
 
     def Array_Args(self):
-        pass
+        top = self.symbol_table['IDs'][-1]
+        del self.symbol_table['IDs'][-1]
+        self.symbol_table['IDs'].append((top[0], 'int*', top[2], top[3]))
+
     def Next_Scope(self):
-        pass
+        self.current_scope += 1
+
     def Prev_Scope(self):
-        pass
+        #Until reaching another scope del vars and functions
+        for i in self.symbol_table['IDs'][::-1]:
+            if i[3] == self.current_scope:
+                del self.symbol_table['IDs'][-1]
+        self.current_scope -= 1
+
     def End_of_Loop_Break(self):
         pass
     def Assignment(self):
@@ -147,4 +166,5 @@ class Codegen:
         return address
 
     def find_address(self, address):
+
         pass
