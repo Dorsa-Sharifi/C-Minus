@@ -1,17 +1,23 @@
-from operator import index
 
 from PB import PB
 from SS import SS
 
-
-
 #TODO Get back for printing possible errors
 class Codegen:
     def __init__(self):
+        self.base_address = 500
+        self.memory_size = 4
         self.index = 0
         self.current_scope = 0
         self.ss = SS()
         self.pb = PB()
+        self.RS = []
+        self.OperationDict = {'+': 'ADD',
+                              '-': 'SUB',
+                              '*': 'MUL',
+                              '/': 'DIV',
+                              '<': 'LT',
+                              '==': 'ASSIGN'}
 
     def run(self, action):
         pass
@@ -43,8 +49,7 @@ class Codegen:
         self.ss.push(self.index)
 
     def While_Jumps(self):
-        self.pb.Add_Code('JPF', {self.ss.access_members(-2)}, {self.index + 1}, '',
-                         self.ss.access_members(-1))
+        self.pb.Add_Code('JPF', {self.ss.access_members(-2)}, {self.index + 1}, '',self.ss.access_members(-1))
         self.pb.Add_Code('JP', self.ss.access_members(-3), '','',self.index)
         self.index += 1
         self.ss.pop()
@@ -57,57 +62,53 @@ class Codegen:
     def Pop_Relation(self, relation):
         self.ss.push(relation)
 
-    def Save_Operation(self):
-        addr = self.get_temp()
-        operand2, operator, operand1 = self.ss.pop_with_num(3)
-        #TODO: a list of operands + add_code function
-        self.ss.push(addr)
-        pass
-
     def Negative(self):
-        temp = self.get_temp()
+        temp = self.generateTemp()
         to_be_negated = self.ss.pop()
         self.pb.Add_Code('SUB', 0, to_be_negated, temp, self.index)
         self.ss.push(temp)
 
-    def Multiply_Division(self):
-        pass
-
     def Func_Output(self):
-        pass
-    def Func_Call(self):
-        pass
+        if self.ss.access_members(-2) == 'output':
+            self.pb.Add_Code('PRINT', self.ss.pop())
+
 
     #Related to Scoping, other stacks, etc
     def Create_Arr(self):
         #TODO:  Creates an array entry in the symbol table with the previously pushed number as its size.
         pass
     def Params_Declaration(self):
+        #TODO: SYMBOL TABLE
         pass
     def Func_Beginning(self):
         pass
+
     def Search_For_Return(self):
-        pass
-    def Found_Return(self):
-        pass
+        self.RS.append('>>>')
+
     def Return_Main(self):
+        if self.ss.access_members(-3) != 'main':
+            return_address = self.ss.access_members(-1)
+            self.pb.Add_Code('JP', f'@{return_address}')
         pass
-    def Func_Ending(self):
-        pass
-    def New_Break(self):
-        pass
-    def Return_Scope_with_Break(self):
-        pass
-    def Save_Return_Point(self):
-        pass
-    def Push_ID_Addr(self):
-        pass
+
+    def Push_ID_Addr(self, addr):
+        self.ss.push(self.find_address(addr))
+
     def Add_Var_SS(self):
         #Scope Managing
         top = self.ss.pop()
-        addr = self.get_temp()
+        addr = self.generateTemp()
         scope = self.current_scope
         #TODO Add the given popped value to the symbol table
+
+    def Save_Operation(self):
+        addr = self.generateTemp()
+        operand2, operator, operand1 = self.ss.pop_with_num(3)
+        opcode = self.OperationDict[operator]
+        self.pb.Add_Code(opcode, operand1, operand2, addr,self.index)
+        self.ss.push(addr)
+
 
     def Array_Args(self):
         pass
@@ -121,8 +122,29 @@ class Codegen:
         pass
     def Array_Indices(self):
         pass
+    def Multiply_Division(self):
+        pass
+    def Func_Call(self):
+        pass
+    def Func_Ending(self):
+        pass
+    def New_Break(self):
+        pass
+    def Return_Scope_with_Break(self):
+        pass
+    def Save_Return_Point(self):
+        pass
+    def Found_Return(self):
+        pass
+
 
     #Handy Functions
-    def get_temp(self):
-        #TODO
-        return None
+    def generateTemp(self, i = 1):
+        address = self.base_address
+        for j in range(i):
+            self.pb.Add_Code('ASSIGN', '#0', str(self.base_address))
+            self.base_address += self.memory_size
+        return address
+
+    def find_address(self, address):
+        pass
