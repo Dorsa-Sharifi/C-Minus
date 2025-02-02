@@ -4,6 +4,7 @@ class SS:
 
     def push(self, element):
         self.stack.append(element)
+        print(self.stack)
 
     def pop(self):
         if len(self.stack) > 0:
@@ -14,9 +15,11 @@ class SS:
         return len(self.stack) == 0
 
     def pop_with_num(self, number):
+        a = []
         if len(self.stack) >= number:
-            a, b, c = self.stack.pop(), self.stack.pop(), self.stack.pop()
-            return a, b, c
+            for i in range(number):
+                a.append(self.stack.pop())
+            return a
         else:
             return None
     def access_members(self, index):

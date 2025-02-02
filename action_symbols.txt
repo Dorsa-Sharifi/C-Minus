@@ -1,3 +1,15 @@
+#Push_ID
+#Push_Num
+#Add_Var_SS
+#Create_Arr
+#Params_Declaration
+#Func_Beginning
+#Search_For_Return
+#Found_Return
+#Return_Main
+#Func_Ending
+#Array_Args
+===========================
 Program -> DeclarationList
 DeclarationList -> Declaration DeclarationList
 DeclarationList -> epsilon
@@ -6,8 +18,8 @@ DeclarationInitial -> TypeSpecifier #Push_ID ID
 DeclarationPrime -> FunDeclarationPrime
 DeclarationPrime -> VarDeclarationPrime
 VarDeclarationPrime -> ; #Add_Var_SS
-VarDeclarationPrime -> [ #Push_Number NUM ] ; #Create_Array
-FunDeclarationPrime -> #Param_Def ( Params ) #Func_Beginning #Mark_Return CompoundStmt #close_return #Back_to_Main #Func_Ending
+VarDeclarationPrime -> [ #Push_Num NUM ] ; #Create_Arr
+FunDeclarationPrime -> #Params_Declaration ( Params ) #Func_Beginning #Search_For_Return CompoundStmt #Found_Return #Return_Main #Func_Ending
 TypeSpecifier -> int
 TypeSpecifier -> void
 Params -> int #Push_ID ID #Add_Var_SS ParamPrime ParamList
@@ -15,7 +27,7 @@ Params -> void
 ParamList -> , Param #Add_Var_SS ParamList
 ParamList -> epsilon
 Param -> DeclarationInitial ParamPrime
-ParamPrime -> #Arr_Args_Def [ ]
+ParamPrime -> #Array_Args [ ]
 ParamPrime -> epsilon
 CompoundStmt -> #Next_Scope { DeclarationList StatementList } #Prev_Scope
 StatementList -> Statement StatementList
@@ -25,40 +37,40 @@ Statement -> CompoundStmt
 Statement -> SelectionStmt
 Statement -> IterationStmt
 Statement -> ReturnStmt
-ExpressionStmt -> Expression ; #Remove_Extra_Data
-ExpressionStmt -> break ; #end_of_loop_with_break
+ExpressionStmt -> Expression ; #Remove_Data_From_SS
+ExpressionStmt -> break ; #End_of_Loop_Break
 ExpressionStmt -> ;
-SelectionStmt -> if ( Expression ) #save Statement ElseStmt
-ElseStmt -> #jump endif
-ElseStmt -> else #Save_JPF Statement #jump endif
-IterationStmt -> while #label ( Expression ) #new_break #save Statement #While_Jumps #back_to_scope_with_end_break
-ReturnStmt -> return ReturnStmtPrime #Push_Return_Point
-ReturnStmtPrime -> #Push_index ;
+SelectionStmt -> if ( Expression ) #Save Statement ElseStmt
+ElseStmt -> #Jump endif
+ElseStmt -> else #Jpf_Save Statement #Jump endif
+IterationStmt -> while #Label ( Expression ) #New_Break #Save Statement #While_Jumps #Return_Scope_with_Break
+ReturnStmt -> return ReturnStmtPrime #Save_Return_Point
+ReturnStmtPrime -> #Push_Index ;
 ReturnStmtPrime -> Expression ;
 Expression -> SimpleExpressionZegond
 Expression -> #Push_ID_Addr ID B
-B -> = Expression #Assignment_Op
+B -> = Expression #Assignment
 B -> [ Expression ] #Array_Indices H
 B -> SimpleExpressionPrime
-H -> = Expression #Assignment_Op
+H -> = Expression #Assignment
 H -> G D C
 SimpleExpressionZegond -> AdditiveExpressionZegond C
 SimpleExpressionPrime -> AdditiveExpressionPrime C
-C -> #Push_Relation Relop AdditiveExpression #Save_Operation
+C -> #Pop_Relation Relop AdditiveExpression #Save_Operation
 C -> epsilon
 Relop -> <
 Relop -> ==
 AdditiveExpression -> Term D
 AdditiveExpressionPrime -> TermPrime D
 AdditiveExpressionZegond -> TermZegond D
-D -> #Push_Relation Addop Term D #Save_Operation
+D -> #Pop_Relation Addop Term D #Save_Operation
 D -> epsilon
 Addop -> +
 Addop -> -
 Term -> SignedFactor G
 TermPrime -> SignedFactorPrime G
 TermZegond -> SignedFactorZegond G
-G -> #Push_Relation Mulop SignedFactor #Mult_Div_Operation G
+G -> #Pop_Relation Mulop SignedFactor #Multiply_Division G
 G -> epsilon
 Mulop -> *
 Mulop -> /
@@ -71,15 +83,15 @@ SignedFactorZegond -> - Factor #Negative
 SignedFactorZegond -> FactorZegond
 Factor -> ( Expression )
 Factor -> #Push_ID_Addr ID VarCallPrime
-Factor -> #Push_Number NUM
-VarCallPrime -> ( Args #output_function ) #call_function
+Factor -> #Push_Num NUM
+VarCallPrime -> ( Args #Func_Output ) #Func_Call
 VarCallPrime -> VarPrime
 VarPrime -> [ Expression ] #Array_Indices
 VarPrime -> epsilon
-FactorPrime -> ( Args #output_function ) #call_function
+FactorPrime -> ( Args #Func_Output ) #Func_Call
 FactorPrime -> epsilon
 FactorZegond -> ( Expression )
-FactorZegond -> #Push_Number NUM
+FactorZegond -> #Push_Num NUM
 Args -> ArgList
 Args -> epsilon
 ArgList -> Expression ArgListPrime
